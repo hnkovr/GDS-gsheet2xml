@@ -1,8 +1,20 @@
 #!/bin/bash
+
+if [[ "$*" == *"--debug"* ]]; then
+  echo "Running with DEBUG mode (echo all executing bash,..?)"
+  set -x  # enable debug mode
+else
+  echo "Use --debug for running with DEBUG mode"
+fi
+
+echo "The first argument is: $1"
+echo "The second argument is: $2"
+echo "The second argument is: $3"
+
 PYTHON="python-3.9.16"
 
 # Heroku app name
-APP_NAME="gsheet-to-xml7"  #! Find&Replace all
+APP_NAME="gsheet-to-xml$1"  #! Find&Replace all
 echo Starting app $APP_NAME
 
 ##? 1st login
@@ -37,7 +49,7 @@ heroku buildpacks:set heroku/python
 echo "web: uvicorn main:app --host 0.0.0.0 --port \$PORT --workers 1" > Procfile
 
 # create a new file `runtime.txt` in the root of your project with the following contents:
-#echo "python-3.11.2" > runtime.txt
+echo # echo "python-3.11.2" > runtime.txt
 echo $PYTHON > runtime.txt
 
 ## create a new file `requirements.txt` in the root of your project with the following contents:
@@ -46,9 +58,9 @@ echo $PYTHON > runtime.txt
 #echo "fastapi" >> requirements.txt
 #echo "uvicorn" >> requirements.txt
 #echo "sqlalchemy" >> requirements.txt
-echo "# app <$APP_NAME> was used!" >> requirements.txt
+#echo "# app <$APP_NAME> was used!" >> requirements.txt
 
-# add all files to Git and push to Heroku
+echo # add all files to Git and push to Heroku
 git init
 git add .
 
@@ -60,9 +72,17 @@ heroku git:remote -a $APP_NAME
 git push heroku master
 git push heroku main
 
-# View logf
+# Check if --run argument is present
+if [[ "$*" == *"--run"* ]]; then
+  echo "Running the deployed solution:.."
+  # do something when --run is present
+  sh heroku_2_run.sh
+else
+  echo "Not running the deployed solution."
+  # do something when --run is not present
+fi
+
+echo # View logf
 heroku logs --tail
 
-#todo: if $RUN_AFTER_DEPLOY
-sh heroku_2_run.sh
-heroku logs --tail
+set +x  # disable debug mode

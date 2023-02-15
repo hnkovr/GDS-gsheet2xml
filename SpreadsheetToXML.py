@@ -43,12 +43,12 @@ class SpreadsheetToXML:
         elif creds_file and use_creds_file:
             creds_gdrive_id = None
             warn(f"! Using existing creds: use_creds_file={use_creds_file}: exising <{creds_file}>'ll be used!")
-            xxx = (self.creds_gdrive_id, self.creds_file)
-            assert any(xxx) and not all(xxx), f"Should be exactly one of {(self.creds_gdrive_id, self.creds_file) = }"
+
+        xxx = (self.creds_gdrive_id, self.creds_file, self.creds_file_content)
+        assert any(xxx) and not all(xxx), f"Should be any, but not all of {(xxx = }"
 
         # self.scope = CONFIG.SCOPE
         # assert all((self.scope,))
-
         # store_attr()
 
     @ef
@@ -64,6 +64,7 @@ class SpreadsheetToXML:
         elif not os.path.isfile(self.creds_file):
             need_gdown = True
         if need_gdown:
+            assert self.creds_gdrive_id, f"! For downloading {self.creds_gdrive_id = } should be not empty!"
             self.creds_file = gdown(f'https://drive.google.com/uc?id={self.creds_gdrive_id}')
             logd(f"! Using downloaded creds: {self.creds_file = }")
 
