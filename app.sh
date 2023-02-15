@@ -10,6 +10,7 @@ source .env_name_1/bin/activate
 pip install -r requirements.txt
 pip install uvicorn
 
+python heroku_0_init.py
 uvicorn main:app --reload
 
 echo app.sh has been started!

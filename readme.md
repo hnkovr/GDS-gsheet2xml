@@ -1,10 +1,9 @@
-## To set env vars before run:
-```yaml
-API_KEY: AIzaS...fg
-creds_gdrive_id: 1QQwd...k5
-```
-## To run:
-```bash
-sh arun.sh
+## 1 Deploy & run
+```shell
+sh heroku_1_deploy.sh
 ```
 
+## 2 Run
+```shell
+sh heroku_2_run.sh
+```

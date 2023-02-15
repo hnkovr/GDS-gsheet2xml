@@ -1,3 +1,4 @@
+import doctest
 import os
 import sys
 from textwrap import shorten
@@ -5,7 +6,8 @@ from typing import Optional, Any, Callable
 
 import yaml
 from loguru import logger as log
-
+logd = log.debug
+ef = log.catch
 
 class FileNotFoundError(Exception): pass
 
@@ -36,8 +38,14 @@ def load_key(filename: str, key: str, *, skip_err: bool = True, loader: Callable
         return data.get(key)
 
 
-def fprint(yaml_fname, max_len=1111, print=print):
-    with open(yaml_fname) as f: print(f"File <{yaml_fname}> content:\n{shorten(f.read(), max_len)}\n{'*' * 88}")
+def fprint(fname, max_len=1111, print=print, no_split=False):
+    with open(fname) as f:
+        fcontent = f.read()
+        print(f"File <{fname}> content:",
+              f"{shorten(fcontent, max_len) if len(fcontent) > max_len else fcontent}",
+              (f"{'*' * 88}" if not no_split else ''),
+              sep='\n'
+              )
 
 
 class Tests:
@@ -88,10 +96,52 @@ def init_loguru():
     if format: log.debug(f"{format=}")
 
 
+class UnknownArgsForRunThisPy(Exception):
+    def __init__(self):
+        # super().
+        log.critical(f"{UnknownArgsForRunThisPy}: {{{sys.argv[1:]=}}}")
+
+
+def fwrite(fname, text):
+    with open(fname, 'w') as f: f.write(text)
+
+
+def dedup_lines(fname):
+    """
+    :param fname:
+    :return:
+    >>> fname = 'dedup_lines.test.txt' #+SKIP
+    >>> fwrite(fname, 'line1\\nline2\\nline2\\nline3\\n')
+    >>> fprint(fname, no_split=True)
+    >>> dedup_lines(fname)
+    >>> fprint(fname, no_split=True)
+    >>> os.remove(fname)
+    """
+    with open(fname, 'r') as r:
+        lines = r.readlines()
+    res = []
+    for l in lines:
+        if l not in res: res += l
+    with open(fname, 'w') as w:
+        # w.flush()
+        w.writelines(res)
+    return fname
+
+
 @log.catch
 def main():
-    Tests.test1()
-    Tests.test()
+    if len(sys.argv) >= 2:
+        log.info(f"Running <{__file__}> with args: {{{sys.argv[1:]}}}:..")
+        if sys.argv[1] == '--dedup_lines':
+            fname = sys.argv[2]
+            dedup_lines(fname)
+        else:
+            raise UnknownArgsForRunThisPy
+    else:
+        log.info(f"No args for <{__file__}>: running tests:..")
+        # Tests.test1()
+        # Tests.test()
+        doctest.testmod()
 
 
 if __name__ == '__main__': main()

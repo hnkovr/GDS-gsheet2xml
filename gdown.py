@@ -5,13 +5,11 @@ import re
 from typing import Optional
 
 import requests
-from googleapiclient.discovery import build
 
 from config import CONFIG
 from util import load_key
 
 API_KEY = os.getenv('API_KEY', load_key(CONFIG.YAML, 'API_KEY'))
-
 
 class GDown:
     """Class for downloading Google Drive files
@@ -34,6 +32,9 @@ class GDown:
         """
         self.file_url = file_url
         self.file_id = re.search("(?<=id=)[a-zA-Z0-9-_]*", file_url).group(0)
+
+        from googleapiclient.discovery import build
+        from googleapiclient import errors
         self.service = build('drive', 'v3', developerKey=api_key)
         self.filename = None
 
