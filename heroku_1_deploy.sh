@@ -1,5 +1,7 @@
 #!/bin/bash
 
+source heroku_0_config.sh
+
 if [[ "$*" == *"--debug"* ]]; then
   echo "Running with DEBUG mode (echo all executing bash,..?)"
   set -x  # enable debug mode
@@ -11,10 +13,11 @@ echo "The first argument is: $1"
 echo "The second argument is: $2"
 echo "The second argument is: $3"
 
+export API_KEY=$1
+export creds_gdrive_id=$2
+
 PYTHON="python-3.9.16"
 
-# Heroku app name
-APP_NAME="gsheet-to-xml$1"  #! Find&Replace all
 echo Starting app $APP_NAME
 
 ##? 1st login

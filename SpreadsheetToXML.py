@@ -45,7 +45,7 @@ class SpreadsheetToXML:
             warn(f"! Using existing creds: use_creds_file={use_creds_file}: exising <{creds_file}>'ll be used!")
 
         xxx = (self.creds_gdrive_id, self.creds_file, self.creds_file_content)
-        assert any(xxx) and not all(xxx), f"Should be any, but not all of {(xxx = }"
+        assert any(xxx) and not all(xxx), f"Should be any, but not all of {xxx = }"
 
         # self.scope = CONFIG.SCOPE
         # assert all((self.scope,))

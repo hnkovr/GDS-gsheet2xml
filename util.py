@@ -5,9 +5,75 @@ from textwrap import shorten
 from typing import Optional, Any, Callable
 
 import yaml
-from loguru import logger as log
-logd = log.debug
-ef = log.catch
+
+USE_LOGURU = True
+
+bash = os.system
+logd = logi = print
+ef = lambda _: _
+
+
+# todo?
+# ` def run(f):
+#     def w(*a, **k):
+#         return f(*a, *k)
+#     exec(f"{f.__}")
+#
+# @run
+@ef
+def init_logger():
+    global log, logd, logi, ef
+    if not USE_LOGURU:
+        import logging
+        logging.basicConfig(level=logging.DEBUG)
+        log = logging
+    else:
+        import sys
+        from loguru import logger
+        log = logger
+        logd = log.debug
+        ef = log.catch
+        log.remove()  # remove any existing handlers
+        log.add(sys.stdout,
+                # format=format,
+                level="DEBUG",
+                backtrace=True,
+                diagnose=True,
+                colorize=True,
+                )
+    logd = log.debug
+    logi = log.info
+
+    (lambda msg: [f(msg) for f in (print, log.info)]
+     )(f"# {os.getcwd() = }")
+
+
+init_logger()
+
+
+# @log.catch
+# def init_loguru():
+#     format = None
+#     # format = '{time:YY/MM/DD HH:mm:ss} {level.name[0]} "{file.path}", line {line}: {message}'
+#
+#     log.remove()  # remove any existing handlers
+#     kwargs = dict(format=format,
+#                   level="DEBUG",
+#                   backtrace=True,
+#                   diagnose=True,
+#                   colorize=True,
+#                   )
+#     if not format: del kwargs['format']
+#     log.add(sys.stdout, **kwargs)
+#     if format: log.debug(f"{format=}")
+
+
+def output_by_all_logging_ways(msg):
+    import logging
+    print(f"#print: {msg}")
+    logging.info(f"#logging: {msg}")
+    log.info(f"#logging: {msg}")
+
 
 class FileNotFoundError(Exception): pass
 
@@ -79,21 +145,7 @@ class Tests:
 #     res = bash(cmd)
 #     print(f"> {res}")
 
-@log.catch
-def init_loguru():
-    format = None
-    # format = '{time:YY/MM/DD HH:mm:ss} {level.name[0]} "{file.path}", line {line}: {message}'
 
-    log.remove()  # remove any existing handlers
-    kwargs = dict(format=format,
-                  level="DEBUG",
-                  backtrace=True,
-                  diagnose=True,
-                  colorize=True,
-                  )
-    if not format: del kwargs['format']
-    log.add(sys.stdout, **kwargs)
-    if format: log.debug(f"{format=}")
 
 
 class UnknownArgsForRunThisPy(Exception):
